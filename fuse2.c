@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 static const char *dirpath = "/home/eplayer/Downloads";
-
+static const char *savepath = "/home/eplayer/Downloads/simpanan";
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
  	int res;
@@ -87,9 +87,17 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 static int xmp_rename(const char *from, const char *to)
 {
 	int res;
-	res = rename(from, to);
+	char result[1000]; 
+	char perintah[1000];
+	char asal[1000];
+	system("mkdir /home/eplayer/Downloads/simpanan -p");
+	sprintf(result,"%s%s",savepath,to);
+	sprintf(asal,"%s%s",dirpath,from);
+	res = rename(from, result);
+	sprintf(perintah,"cp %s %s",asal,result);
+	system(perintah);
 	if (res == -1)
-	return -errno;
+		return -errno;
 	return 0;
 }
 
@@ -98,13 +106,6 @@ static int xmp_mknod(const char *path, mode_t mode, dev_t rdev)
 	int res;
 	char fpath[1000];
 	sprintf(fpath,"%s%s",dirpath,path);
-	if (S_ISREG(mode)) {
-		res = open(fpath, O_CREAT | O_EXCL | O_WRONLY, mode);
-		if (res >= 0)
-		res = close(res);
-	} else if (S_ISFIFO(mode))
-	res = mkfifo(fpath, mode);
-	else
 	res = mknod(fpath, mode, rdev);
 	if (res == -1)
 	return -errno;
@@ -115,7 +116,12 @@ static int xmp_open(const char *path, struct fuse_file_info *fi)
 {
 	int res;
 	char fpath[1000];
-	sprintf(fpath,"%s%s",dirpath,path);
+	if(strcmp(path,"/")==0)
+	{
+		path=dirpath;
+		sprintf(fpath,"%s",path);
+	}
+	else sprintf(fpath,"%s%s",dirpath,path);
 	res = open(fpath, fi->flags);
 	if (res == -1)
 		return -errno;
@@ -148,14 +154,9 @@ static int xmp_chmod(const char *path, mode_t mode)
 static int xmp_utimens(const char *path, const struct timespec ts[2])
 {
 	int res;
-	char fpath[1000];
-	sprintf(fpath,"%s%s",dirpath,path);
-	struct timeval tv[2];
-	tv[0].tv_sec = ts[0].tv_sec;
-	tv[0].tv_usec = ts[0].tv_nsec / 1000;
-	tv[1].tv_sec = ts[1].tv_sec;
-	tv[1].tv_usec = ts[1].tv_nsec / 1000;
-	res = utimes(fpath, tv);
+	//char fpath[1000];
+	//sprintf(fpath,"%s%s",dirpath,path);
+	res = utimensat(0,path, ts,AT_SYSLINK_NOFOLLOW);
 	if (res == -1)
 		return -errno;
 	return 0;
@@ -176,6 +177,7 @@ off_t offset, struct fuse_file_info *fi)
 	if (res == -1)
 		res = -errno;
 	close(fd);
+	//printf("pathnya jadi %s\n",fpath);
 	return res;
 }
 
