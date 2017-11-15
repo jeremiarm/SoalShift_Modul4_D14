@@ -17,3 +17,17 @@
 #ifdef HAVE_SETXATTR
 #include <sys/xattr.h>
 #endif
+
+
+static struct fuse_operations xmp_oper = {
+.getattr	= xmp_getattr,
+.write		= xmp_write,
+.readlink	= xmp_readlink,
+.readdir	= xmp_readdir,
+.mknod		= xmp_mknod,
+.rename		= xmp_rename,
+.chmod		= xmp_chmod,
+.truncate	= xmp_truncate,
+.utimens	= xmp_utimens,
+.open		= xmp_open,
+};
