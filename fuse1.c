@@ -24,7 +24,8 @@
 #include <sys/types.h>
  
 static const char *dirpath = "/home/eplayer/Documents";
-static const char *secpath = "/home/eplayer/Documents/rahasia";
+
+
  
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
@@ -78,19 +79,16 @@ size_t size, off_t offset, struct fuse_file_info *fi)
 	char fpath[1000];
 	sprintf(fpath,"%s%s",dirpath,path);
 	char check[1000];
-        char command2[1000];
+        char target[1000];
         sprintf(fpath,"%s%s",dirpath,path);
         int jarak=strlen(fpath);
         strcpy(check,fpath+jarak-4);
 
-        sprintf(command2,"mv %s %s.ditandai",fpath,secpath);
-        if(strcmp(check,".txt")==0 || strcmp(check,".pdf") ==0||
-        strcmp(check,".doc")==0)
+        sprintf(target,"%s.ditandai",fpath);
+	res=rename(fpath,target);
+        if(strcmp(check,".txt")==0 || strcmp(check,".pdf") ==0||strcmp(check,".doc")==0)
         {
-       
        system("zenity --error --text=\"Terjadi Kesalahan! File berisik konten berbahaya.\n\" --title=\"Peringatan\"" );
-
-	system(command2);
                 return -errno;
         }
 
