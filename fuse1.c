@@ -39,14 +39,6 @@ static int xmp_getattr(const char *path, struct stat *stbuf)
 }
  
 
-static int xmp_rename(const char *from, const char *to)
-{
-	int res;
-	res = rename(from, to);
-	if (res == -1)
-		return -errno;
-	return 0;
-}
 static int xmp_readdir(const char *path, void *buf,
 fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi)
 {
@@ -76,17 +68,6 @@ fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi)
 }
  
 
-static int xmp_open(const char *path, struct fuse_file_info *fi)
-{
-	int res;
-	char fpath[1000];
-	res = open(fpath, fi->flags);
-	if (res == -1)
-		return -errno;
- 
-	close(res);
-	return 0;
-}
  
 static int xmp_read(const char *path, char *buf,
 size_t size, off_t offset, struct fuse_file_info *fi)
@@ -127,8 +108,6 @@ size_t size, off_t offset, struct fuse_file_info *fi)
 static struct fuse_operations xmp_oper = {
 	.getattr = xmp_getattr,
 	.readdir = xmp_readdir,
- 	.rename = xmp_rename,
-	.open = xmp_open,
 	.read = xmp_read,
 };
  
