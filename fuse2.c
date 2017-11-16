@@ -93,9 +93,7 @@ static int xmp_rename(const char *from, const char *to)
 	system("mkdir /home/eplayer/Downloads/simpanan -p");
 	sprintf(result,"%s%s",savepath,to);
 	sprintf(asal,"%s%s",dirpath,from);
-	res = rename(from, result);
-	sprintf(perintah,"cp %s %s",asal,result);
-	system(perintah);
+	res = rename(asal, result);
 	if (res == -1)
 		return -errno;
 	return 0;
