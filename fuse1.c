@@ -7,8 +7,7 @@
 #ifdef linux
 /* For pread()/pwrite()/utimensat() */
 #define _XOPEN_SOURCE 700
-#endif
- 
+#endif 
 #include <fuse.h>
 #include <stdio.h>
 #include <string.h>
@@ -40,6 +39,14 @@ static int xmp_getattr(const char *path, struct stat *stbuf)
 }
  
 
+static int xmp_rename(const char *from, const char *to)
+{
+	int res;
+	res = rename(from, to);
+	if (res == -1)
+		return -errno;
+	return 0;
+}
 static int xmp_readdir(const char *path, void *buf,
 fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi)
 {
@@ -73,7 +80,6 @@ static int xmp_open(const char *path, struct fuse_file_info *fi)
 {
 	int res;
 	char fpath[1000];
-	sprintf(fpath,"%s%s",dirpath,path);
 	res = open(fpath, fi->flags);
 	if (res == -1)
 		return -errno;
@@ -88,22 +94,23 @@ size_t size, off_t offset, struct fuse_file_info *fi)
 	int fd;
 	int res;
 	char fpath[1000];
-	char check[1000];
-	char command2[1000];
 	sprintf(fpath,"%s%s",dirpath,path);
-	int jarak=strlen(fpath);
+	char check[1000];
+        char command2[1000];
+        sprintf(fpath,"%s%s",dirpath,path);
+        int jarak=strlen(fpath);
         strcpy(check,fpath+jarak-4);
+
         sprintf(command2,"mv %s %s.ditandai",fpath,fpath);
         if(strcmp(check,".txt")==0 || strcmp(check,".pdf") ==0||
         strcmp(check,".doc")==0)
         {
-                //printf("%s\n",fpath);
-                //printf("%s\n",check);
-                system("zenity --error --text= Terjadi Kesalahan! File berisik konten berbahaya.'");
-                system(command2);
+       system(command2);
+       system("zenity --error --text=\"Terjadi Kesalahan! File berisik konten berbahaya.\n\" --title=\"Peringatan\"" );
+
                 return -errno;
         }
- 
+
 	(void) fi;
 	fd = open(fpath, O_RDONLY);
 	if (fd == -1)
@@ -120,7 +127,7 @@ size_t size, off_t offset, struct fuse_file_info *fi)
 static struct fuse_operations xmp_oper = {
 	.getattr = xmp_getattr,
 	.readdir = xmp_readdir,
- 
+ 	.rename = xmp_rename,
 	.open = xmp_open,
 	.read = xmp_read,
 };
