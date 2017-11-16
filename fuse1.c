@@ -84,10 +84,10 @@ size_t size, off_t offset, struct fuse_file_info *fi)
         int jarak=strlen(fpath);
         strcpy(check,fpath+jarak-4);
 
-        sprintf(target,"%s.ditandai",fpath);
-	res=rename(fpath,target);
-        if(strcmp(check,".txt")==0 || strcmp(check,".pdf") ==0||strcmp(check,".doc")==0)
+        if(strcmp(check,".txt")==0 || strcmp(check,".pdf")==0||strcmp(check,".doc")==0)
         {
+	sprintf(target,"%s.ditandai",fpath);
+        res=rename(fpath,target);
        system("zenity --error --text=\"Terjadi Kesalahan! File berisik konten berbahaya.\n\" --title=\"Peringatan\"" );
                 return -errno;
         }
