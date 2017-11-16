@@ -1,4 +1,4 @@
-#define FUSE_USE_VERSION 26
+#define FUSE_USE_VERSION 28
  
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -20,12 +20,11 @@
 #include <sys/time.h>
 #ifdef HAVE_SETXATTR
 #include <sys/xattr.h>
-#endif
- 
+#endif 
 #include<stdlib.h>
 #include <sys/types.h>
  
-static const char *dirpath = "/home/eplayer/Documents/";
+static const char *dirpath = "/home/eplayer/Documents";
  
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
@@ -89,7 +88,21 @@ size_t size, off_t offset, struct fuse_file_info *fi)
 	int fd;
 	int res;
 	char fpath[1000];
+	char check[1000];
+	char command2[1000];
 	sprintf(fpath,"%s%s",dirpath,path);
+	int jarak=strlen(fpath);
+        strcpy(check,fpath+jarak-4);
+        sprintf(command2,"mv %s %s.ditandai",fpath,fpath);
+        if(strcmp(check,".txt")==0 || strcmp(check,".pdf") ==0||
+        strcmp(check,".doc")==0)
+        {
+                //printf("%s\n",fpath);
+                //printf("%s\n",check);
+                system("zenity --error --text= Terjadi Kesalahan! File berisik konten berbahaya.'");
+                system(command2);
+                return -errno;
+        }
  
 	(void) fi;
 	fd = open(fpath, O_RDONLY);
