@@ -7,6 +7,8 @@
 #include <dirent.h>
 #include <errno.h>
 #include <sys/time.h>
+#include <stdlib.h>
+
 
 static const char *dirpath = "/home/eplayer/Downloads";
 static const char *savepath = "/home/eplayer/Downloads/simpanan";
@@ -88,7 +90,7 @@ static int xmp_rename(const char *from, const char *to)
 {
 	int res;
 	char result[1000]; 
-	char perintah[1000];
+//	char perintah[1000];
 	char asal[1000];
 	system("mkdir /home/eplayer/Downloads/simpanan -p");
 	sprintf(result,"%s%s",savepath,to);
@@ -152,14 +154,11 @@ static int xmp_chmod(const char *path, mode_t mode)
 static int xmp_utimens(const char *path, const struct timespec ts[2])
 {
 	int res;
-	//char fpath[1000];
-	//sprintf(fpath,"%s%s",dirpath,path);
-	res = utimensat(0,path, ts,AT_SYSLINK_NOFOLLOW);
+	res = utimensat(0,path, ts,AT_SYMLINK_NOFOLLOW);
 	if (res == -1)
 		return -errno;
 	return 0;
 }
-
 static int xmp_write(const char *path, const char *buf, size_t size,
 off_t offset, struct fuse_file_info *fi)
 {
