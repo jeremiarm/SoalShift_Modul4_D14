@@ -11,7 +11,7 @@
 
 
 static const char *dirpath = "/home/eplayer/Downloads";
-static const char *savepath = "/home/eplayer/Downloads/simpanan";
+char savepath[] = "/home/eplayer/Downloads/simpanan";
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
  	int res;
@@ -101,17 +101,6 @@ static int xmp_rename(const char *from, const char *to)
 	return 0;
 }
 
-static int xmp_mknod(const char *path, mode_t mode, dev_t rdev)
-{
-	int res;
-	char fpath[1000];
-	sprintf(fpath,"%s%s",dirpath,path);
-	res = mknod(fpath, mode, rdev);
-	if (res == -1)
-	return -errno;
-	return 0;
-}
-
 static int xmp_open(const char *path, struct fuse_file_info *fi)
 {
 	int res;
@@ -135,17 +124,6 @@ static int xmp_truncate(const char *path, off_t size)
 	char fpath[1000];
 	sprintf(fpath,"%s%s",dirpath,path);
 	res = truncate(fpath, size);
-	if (res == -1)
-		return -errno;
-	return 0;
-}
-
-static int xmp_chmod(const char *path, mode_t mode)
-{
-	int res;
-	char fpath[1000];
-	sprintf(fpath,"%s%s",dirpath,path);
-	res = chmod(fpath, mode);
 	if (res == -1)
 		return -errno;
 	return 0;
@@ -182,18 +160,16 @@ static struct fuse_operations xmp_oper = {
 	.getattr	= xmp_getattr,
 	.readdir	= xmp_readdir,
 	.read		= xmp_read,
+	.rename         = xmp_rename,
 	.write		= xmp_write,
-	.rename		= xmp_rename,
-	.mknod		= xmp_mknod,
 	.open		= xmp_open,
-	.chmod		= xmp_chmod,
 	.truncate	= xmp_truncate,
 	.utimens	= xmp_utimens,
 };
 
 int main(int argc, char *argv[])
 {
-	//umask(0);
+	umask(0);
 	return fuse_main(argc, argv, &xmp_oper, NULL);
 }
 
