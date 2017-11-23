@@ -10,8 +10,8 @@
 #include <stdlib.h>
 
 
-static const char *dirpath = "/home/eplayer/Downloads";
-char savepath[] = "/home/eplayer/Downloads/simpanan";
+static const char *dirpath = "/home/ilmi/Downloads";
+char savepath[] = "/home/ilmi/Downloads/simpanan";
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
  	int res;
@@ -92,7 +92,7 @@ static int xmp_rename(const char *from, const char *to)
 	char result[1000]; 
 //	char perintah[1000];
 	char asal[1000];
-	system("mkdir /home/eplayer/Downloads/simpanan -p");
+	system("mkdir /home/ilmi/Downloads/simpanan -p");
 	sprintf(result,"%s%s",savepath,to);
 	sprintf(asal,"%s%s",dirpath,from);
 	res = rename(asal, result);
@@ -182,7 +182,7 @@ static struct fuse_operations xmp_oper = {
 
 int main(int argc, char *argv[])
 {
-	//umask(0);
+	umask(0);
 	return fuse_main(argc, argv, &xmp_oper, NULL);
 }
 

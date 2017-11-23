@@ -8,8 +8,8 @@
 #include <errno.h>
 #include <sys/time.h>
 
-static const char *dirpath = "/home/eplayer/Downloads";
-static const char *savepath = "/home/eplayer/Downloads/simpanan";
+static const char *dirpath = "/home/ilmi/Downloads";
+static const char *savepath = "/home/ilmi/Downloads/simpanan";
 static int xmp_getattr(const char *path, struct stat *stbuf)
 {
  	int res;
@@ -93,7 +93,7 @@ static int xmp_rename(const char *from, const char *to)
 	int res;
 	char result[1000]; 
 	char asal[1000];
-	system("mkdir /home/eplayer/Downloads/simpanan -p");
+	system("mkdir /home/ilmi/Downloads/simpanan -p");
 	sprintf(result,"%s%s.copy",savepath,to);
 	sprintf(asal,"%s%s",dirpath,from);
 	res = rename(asal, result);
@@ -157,7 +157,7 @@ static int xmp_utimens(const char *path, const struct timespec ts[2])
 	int res;
 	//char fpath[1000];
 	//sprintf(fpath,"%s%s",dirpath,path);
-	res = utimensat(0,path, ts, AT_SYSLINK_NOFOLLOW);
+	res = utimensat(0,path, ts, AT_SYMLINK_NOFOLLOW);
 	if (res == -1)
 		return -errno;
 	return 0;
@@ -192,7 +192,7 @@ static struct fuse_operations xmp_oper = {
 	.open		= xmp_open,
 	.chmod		= xmp_chmod,
 	.truncate	= xmp_truncate,
-	//.utimens	= xmp_utimens,
+	.utimens	= xmp_utimens,
 };
 
 int main(int argc, char *argv[])
