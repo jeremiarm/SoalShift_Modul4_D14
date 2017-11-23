@@ -156,6 +156,18 @@ off_t offset, struct fuse_file_info *fi)
 	return res;
 }
 
+
+static int xmp_mknod(const char *path, mode_t mode, dev_t rdev)
+{
+int res;
+char fpath[1000];
+sprintf(fpath,"%s%s", dirpath, path);
+res = mknod(fpath, mode, rdev);
+if(res == -1)
+return -errno;
+return 0;
+}
+
 static struct fuse_operations xmp_oper = {
 	.getattr	= xmp_getattr,
 	.readdir	= xmp_readdir,
@@ -164,12 +176,13 @@ static struct fuse_operations xmp_oper = {
 	.write		= xmp_write,
 	.open		= xmp_open,
 	.truncate	= xmp_truncate,
+	.mknod		= xmp_mknod,
 	.utimens	= xmp_utimens,
 };
 
 int main(int argc, char *argv[])
 {
-	umask(0);
+	//umask(0);
 	return fuse_main(argc, argv, &xmp_oper, NULL);
 }
 
